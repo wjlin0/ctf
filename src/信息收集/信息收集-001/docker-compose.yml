@@ -1,0 +1,10 @@
+version: '2'
+services:
+  web:
+    build: .
+    image: wjlin1/ctf:xinxishouji-001
+    restart: always
+    ports:
+      - "1001:80"
+    environment:
+      - FLAG=flag{1234567890}

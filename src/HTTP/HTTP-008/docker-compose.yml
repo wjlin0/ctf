@@ -1,0 +1,10 @@
+version: '2'
+services:
+  web:
+    build: .
+    image: wjlin1/ctf:http-008
+    restart: always
+    ports:
+      - "1108:80"
+    environment:
+      - FLAG=flag{1234567890}
