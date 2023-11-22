@@ -1,0 +1,10 @@
+version: '2'
+services:
+  web:
+    build: .
+    image: wjlin1/ctf:http-014
+    restart: always
+    ports:
+      - "1114:80"
+    environment:
+      - FLAG=flag{knownsec}

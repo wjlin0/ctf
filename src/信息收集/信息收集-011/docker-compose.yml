@@ -1,0 +1,10 @@
+version: '2'
+services:
+  web:
+    build: .
+    image: wjlin1/ctf:xinxishouji-011
+    restart: always
+    ports:
+      - "1011:80"
+    environment:
+      - FLAG=flag{knownsec}

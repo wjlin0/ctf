@@ -22,3 +22,4 @@ tar -czf /var/www/html/www.tar.gz -C "$temp_dir" .
 rm -rf "$temp_dir"
 
 export FLAG=not_here
+rm -f /flag.sh

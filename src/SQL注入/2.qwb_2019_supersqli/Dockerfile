@@ -1,4 +1,4 @@
-FROM ctftraining/base_image_nginx_mysql_php_73
+FROM wjlin1/base_image_nginx_mysql_php:7.3
 
 LABEL Author="glzjin <i@zhaoj.in>"
 LABEL Blog="https://www.zhaoj.in"

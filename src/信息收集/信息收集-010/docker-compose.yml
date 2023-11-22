@@ -7,4 +7,4 @@ services:
     ports:
       - "1010:80"
     environment:
-      - FLAG=flag{1234567890}
+      - FLAG=flag{knownsec}

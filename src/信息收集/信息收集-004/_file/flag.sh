@@ -11,3 +11,4 @@ if [ -f $flagfile ]; then
     fi
 fi
 export FLAG=not_here
+rm -f /flag.sh

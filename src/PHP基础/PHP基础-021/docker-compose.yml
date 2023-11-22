@@ -1,0 +1,10 @@
+version: '2'
+services:
+  web:
+    build: .
+    image: wjlin1/ctf:php-jichu-021
+    restart: always
+    ports:
+      - "1221:80"
+    environment:
+      - FLAG=flag{knownsec}

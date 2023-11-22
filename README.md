@@ -20,3 +20,6 @@ docker ps -a
 ./script/start.sh ../src/信息收集 remove
 docker ps -a
 ```
+## CTF 平台
+> 只允许公司内网访问
+> http://ctf.carinago.com

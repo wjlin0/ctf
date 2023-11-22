@@ -1,4 +1,4 @@
-FROM ctftraining/base_image_nginx_mysql_php_73
+FROM wjlin1/base_image_nginx_mysql_php:7.3
 COPY files/ /var/www/html/
 ENV DB_HOST=localhost DB_USER=root DB_PASSWORD=root DB_NAME=ptbctf
 RUN sh -c "mysqld_safe &" &&\

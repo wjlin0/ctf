@@ -27,9 +27,13 @@ for directory in "$base_directory"/*; do
 
         # 根据操作类型执行相应的命令
         case "$action" in
-            "build")
+            "up")
                 # 运行 docker-compose up -d 命令
                 docker-compose up -d
+                ;;
+            "build")
+                # 运行 docker-compose build 命令
+                docker-compose build
                 ;;
             "down")
                 # 运行 docker-compose down 命令
