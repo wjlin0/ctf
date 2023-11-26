@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 sleep 1
 
 # 检查环境变量是否已经设置

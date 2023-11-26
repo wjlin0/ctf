@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # 检查是否提供了足够的参数
 if [ "$#" -ne 2 ]; then

