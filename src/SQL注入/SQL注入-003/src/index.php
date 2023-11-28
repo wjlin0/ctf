@@ -1,8 +1,6 @@
 <?php
 
-global $flag;
 global $db;
-require "flag.php";
 require "db.php";
 
 $id= $_GET['id'];

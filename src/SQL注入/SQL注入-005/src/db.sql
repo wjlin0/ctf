@@ -1,18 +1,6 @@
-/*
- Navicat Premium Data Transfer
-
- Source Server         : localhost
- Source Server Type    : MySQL
- Source Server Version : 50726 (5.7.26)
- Source Host           : localhost:3306
- Source Schema         : ctf
-
- Target Server Type    : MySQL
- Target Server Version : 50726 (5.7.26)
- File Encoding         : 65001
-
- Date: 24/11/2023 13:07:03
-*/
+DROP DATABASE IF EXISTS `ctf`;
+CREATE DATABASE IF NOT EXISTS ctf CHARACTER SET utf8mb4;
+USE ctf;
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -22,7 +10,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `flag`;
 CREATE TABLE `flag`  (
-  `flag` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
+    `flag` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
 ) ENGINE = MyISAM CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -35,10 +23,10 @@ INSERT INTO `flag` VALUES ('flag{********************************}');
 -- ----------------------------
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+                         `id` int(11) NOT NULL AUTO_INCREMENT,
+                         `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                         `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                         PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = MyISAM AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
