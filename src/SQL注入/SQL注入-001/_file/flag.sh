@@ -2,7 +2,7 @@
 sleep 1
 
 
-flagfile=/var/www/html/flag.php
+flagfile=/var/www/html/db.sql
 
 if [ -f $flagfile ]; then
     # 从环境变量中获取 flag
