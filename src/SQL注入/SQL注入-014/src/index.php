@@ -20,7 +20,7 @@ $usernames = NULL;
 $passwords = NULL;
 if (!is_null($id)){
     $sql = "select id,username,password from ctf.user where id='".$id."'";
-    echo $sql;
+   // echo $sql;
     $row = $db->query($sql);
     if ($row->num_rows > 0){
 

