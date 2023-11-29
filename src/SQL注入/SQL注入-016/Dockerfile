@@ -7,4 +7,5 @@ RUN apk add shadow && \
     usermod -aG mysql www-data
 COPY src/ /var/www/html/
 COPY _file/flag.sh /flag.sh
+COPY _file/cat_flag /cat_flag
 COPY _file/my.cnf /etc/mysql/my.cnf

@@ -2,8 +2,6 @@
 sleep 1
 
 
-# 修改 secure_file_priv 允许读写
-
 
 flagfile=/var/www/html/db.sql
 
@@ -21,8 +19,8 @@ custom_flag="${FLAG:-$default_flag}"
 
 echo -n "$custom_flag" > /flag
 chmod 400 /flag
-echo -n "cat /flag" > /cat_flag.sh
-chmod u+x /bin/sh
+chown root:root /cat_flag
+chmod u+x /cat_flag
 
 
 

