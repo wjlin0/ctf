@@ -2,7 +2,8 @@
 sleep 1
 
 
-custom_flag=${FLAG:-flag{********************************}}
+default_flag="flag{********************************}"
+custom_flag="${FLAG:-$default_flag}"
 
 
 randomNumber=$((RANDOM % 101))
