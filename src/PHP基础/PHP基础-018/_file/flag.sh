@@ -7,7 +7,7 @@ flagfile=/flag
 # shellcheck disable=SC2034
 default_flag="flag{********************************}"
 custom_flag="${FLAG:-$default_flag}"
-echo -n "$custom_flag" > /flag
+echo "$custom_flag" > /flag
 
 
 
