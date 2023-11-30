@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['user_id'] = $userId;
         $_SESSION["username"] = $username;
         $_SESSION["password"] = $password;
-        if ($_SESSION['user_id'] === 0){
+        if ($_SESSION['user_id'] === 1){
             $_SESSION["is_admin"] = 1;
         }else{
             $_SESSION["is_admin"] = 0;

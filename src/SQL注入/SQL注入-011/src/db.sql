@@ -32,8 +32,8 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (0, 'admin', '37f5a03e27fbe570aa63e089b1d78f34');
-INSERT INTO `user` VALUES (1, 'wjlin0', '37f5a03e27fbe570aa63e089b1d78f34');
-INSERT INTO `user` VALUES (2, 'knownsec', '37f5a03e27fbe570aa63e089b1d78f34');
+INSERT INTO `user` VALUES (1, 'admin', '37f5a03e27fbe570aa63e089b1d78f34');
+INSERT INTO `user` VALUES (2, 'wjlin0', '37f5a03e27fbe570aa63e089b1d78f34');
+INSERT INTO `user` VALUES (3, 'knownsec', '37f5a03e27fbe570aa63e089b1d78f34');
 
 SET FOREIGN_KEY_CHECKS = 1;
