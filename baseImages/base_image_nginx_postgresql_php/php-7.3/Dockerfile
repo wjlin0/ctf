@@ -1,7 +1,8 @@
 FROM ubuntu:20.04
 
-ENV TZ=Asia/Shanghai
-LABEL org.opencontainers.image.authors="wjlin0"
+LABEL Organization="wjlin0" Author="wjlin0 wjlgeren@163.com"
+
+MAINTAINER wjlin0@wjlin0.com <wjgeren@163.com>
 
 COPY _files tmp/
 COPY src /var/www/html
