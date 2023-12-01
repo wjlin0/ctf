@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# 启动 PostgreSQL
+service postgresql start
+
+# 等待 PostgreSQL 就绪
+pgsql_ready() {
+    pg_isready -h localhost -U postgres
+}
+
+while !(pgsql_ready)
+do
+    echo "waiting for PostgreSQL ..."
+    sleep 3
+done
+
+# 如果存在 /flag.sh 文件，则执行它
+if [ -f /flag.sh ]; then
+    source /flag.sh
+fi
+
+# 如果存在 /var/www/html/db.sql 文件，则导入数据到 PostgreSQL
+if [ -f /var/www/html/db.sql ]; then
+    psql -U postgres -f /var/www/html/db.sql
+    rm -f /var/www/html/db.sql
+fi
+
+# 启动 PHP-FPM
+service php7.3-fpm start
+
+# 启动 Nginx
+nginx &
+
+# 阻塞容器，保持运行
+tail -F /dev/null
