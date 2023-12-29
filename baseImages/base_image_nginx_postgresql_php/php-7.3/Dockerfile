@@ -9,7 +9,8 @@ COPY src /var/www/html
 
 
 # 安装 Nginx, PHP 和 PostgreSQL 客户端的依赖
-RUN apt-get update \
+RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list \
+    && apt-get update \
     && apt-get install -y wget gnupg2 software-properties-common \
     && mkdir -p /etc/apt/sources.list.d/ \
     && sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \

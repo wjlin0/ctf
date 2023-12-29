@@ -1,0 +1,10 @@
+version: '2'
+services:
+  web:
+    build: .
+    image: wjlin1/ctf:sql-postgresql-018
+    restart: always
+    ports:
+      - "1318:80"
+    environment:
+      - FLAG=flag{knownsec}

