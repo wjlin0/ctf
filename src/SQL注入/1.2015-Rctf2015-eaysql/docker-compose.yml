@@ -1,6 +1,0 @@
-version: '2'
-services:
- rct-2015-eaysql:
-   image: "2015-rctf2015-eaysql"
-   ports:
-    - "1001:80"
