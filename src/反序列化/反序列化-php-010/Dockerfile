@@ -1,0 +1,6 @@
+FROM wjlin1/base_image_nginx_mysql_php:7.3.4
+ENV TZ=Asia/Shanghai
+LABEL org.opencontainers.image.authors="wjlin0"
+COPY src/ /var/www/html/
+COPY _file/flag.sh /flag.sh
+COPY _file/nginx.conf /etc/nginx/nginx.conf

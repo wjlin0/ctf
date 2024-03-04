@@ -2,9 +2,9 @@ version: '2'
 services:
   web:
     build: .
-    image: wjlin1/ctf:sql-postgresql-023
+    image: wjlin1/ctf:sql-postgresql-024
     restart: always
     ports:
-      - "1323:80"
+      - "1324:80"
     environment:
       - FLAG=flag{knownsec}

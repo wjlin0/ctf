@@ -9,6 +9,7 @@ COPY src /var/www/html
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories \
     && apk add --update --no-cache tar nginx mysql mysql-client \
+    && mkdir -p /run/nginx \
     # mysql ext
     && docker-php-source extract \
     && docker-php-ext-install pdo_mysql mysqli \

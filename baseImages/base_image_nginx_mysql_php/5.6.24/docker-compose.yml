@@ -1,0 +1,10 @@
+version: "3"
+services:
+  web:
+    build: .
+    image: wjlin1/base_image_nginx_mysql_php:5.6.24
+    platform: linux/amd64
+    ports:
+      - "8088:80"
+    environment:
+      - FLAG=flag{knownsec}

@@ -1,0 +1,12 @@
+version: '3'
+services:
+  web:
+    build: .
+    container_name: unserialize-php-003
+    image: wjlin1/ctf:unserialize-php-003
+    restart: always
+    platform: linux/amd64
+    ports:
+      - "1503:80"
+    environment:
+      - FLAG=flag{knownsec}
