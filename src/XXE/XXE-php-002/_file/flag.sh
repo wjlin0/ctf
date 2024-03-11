@@ -1,15 +1,12 @@
 #!/usr/bin/env sh
 sleep 1
 
+# shellcheck disable=SC2034
+flagfile=/flag
+# shellcheck disable=SC2034
+default_flag="flag{********************************}"
+custom_flag="${FLAG:-$default_flag}"
+echo "$custom_flag" > /flag
 
-flagfile=/var/www/html/flag.php
-
-if [ -f $flagfile ]; then
-    # 从环境变量中获取 flag
-    custom_flag="$FLAG"
-    if [ -n "$custom_flag" ]; then
-        sed -i "s/flag{\*\*\**}/$custom_flag/" $flagfile
-    fi
-fi
 export FLAG=not_here
 rm -f /flag.sh

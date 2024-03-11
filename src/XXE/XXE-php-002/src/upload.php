@@ -43,11 +43,7 @@ if ((($_FILES["file"]["type"] == "text/xml")
             // echo "<a href=\"./index.php?file=data.xml\">查看学籍数据</a><br>";
             libxml_disable_entity_loader(false);
             $xmlfile = file_get_contents("./uploads/" . $_FILES["file"]["name"]);
-            // $dom = new DOMDocument(); 
-            
-            // $dom->loadXML($xmlfile);
-            // $students = simplexml_import_dom($dom);
-            $students = @simplexml_load_string($dom,'SimpleXMLElement',LIBXML_NOENT);
+            $students = @simplexml_load_string($xmlfile,'SimpleXMLElement',LIBXML_NOENT);
         }
         else
         {
@@ -58,10 +54,6 @@ if ((($_FILES["file"]["type"] == "text/xml")
             echo "<br>" . $_FILES["file"]["name"] . "的新数据已成功读入系统！<br>";
             libxml_disable_entity_loader(false);
             $xmlfile = file_get_contents("./uploads/" . $_FILES["file"]["name"]);
-            // $dom = new DOMDocument(); 
-            
-            // $dom->loadXML($xmlfile);
-            // $students = simplexml_import_dom($dom);
             $students = @simplexml_load_string($xmlfile,'SimpleXMLElement',LIBXML_NOENT);
         }
     }

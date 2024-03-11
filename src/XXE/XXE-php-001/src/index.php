@@ -20,10 +20,6 @@ if(isset($_GET['file'])){
   
   libxml_disable_entity_loader(false);
   $xmlfile = file_get_contents("./uploads/" . $_GET['file']);
-  // $dom = new DOMDocument(); 
-  
-  // $dom->loadXML($xmlfile);
-  // $students = simplexml_import_dom($dom);
   $students = @simplexml_load_string($xmlfile,'SimpleXMLElement',LIBXML_NOENT);
   foreach ($students->student as $student) {
     print $student->name .  "    " . $student->year . "    " . $student->school .  "<br>";

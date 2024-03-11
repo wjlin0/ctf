@@ -1,9 +1,10 @@
-version: '2'
+version: '3'
 services:
   web:
     build: .
     image: wjlin1/ctf:xxe-php-001
     restart: always
+    platform: linux/amd64
     ports:
       - "1601:80"
     environment:

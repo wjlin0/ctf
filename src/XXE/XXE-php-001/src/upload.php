@@ -41,6 +41,9 @@ if ((($_FILES["file"]["type"] == "text/xml")
         {
             echo "uploads/" . $_FILES["file"]["name"] . " 文件已经存在，本次上传已终止，不会覆盖原文件。 <br>";
             echo "<a href=\"./index.php?file=data.xml\">查看学籍数据</a><br>";
+            libxml_disable_entity_loader(false);
+            $xmlfile = file_get_contents("./uploads/" . $_FILES["file"]["name"]);
+            $students = @simplexml_load_string($xmlfile,'SimpleXMLElement',LIBXML_NOENT);
         }
         else
         {
@@ -48,6 +51,9 @@ if ((($_FILES["file"]["type"] == "text/xml")
             move_uploaded_file($_FILES["file"]["tmp_name"], "uploads/" . $_FILES["file"]["name"]);
             echo "文件上传成功，存储在：" . "uploads/" . $_FILES["file"]["name"];
             echo "<br><a href=\"./index.php?file=data.xml\">查看学籍数据</a><br>";
+            libxml_disable_entity_loader(false);
+            $xmlfile = file_get_contents("./uploads/" . $_FILES["file"]["name"]);
+            $students = @simplexml_load_string($xmlfile,'SimpleXMLElement',LIBXML_NOENT);
         }
     }
 }
