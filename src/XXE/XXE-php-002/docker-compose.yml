@@ -1,0 +1,10 @@
+version: '2'
+services:
+  web:
+    build: .
+    image: wjlin1/ctf:xxe-php-002
+    restart: always
+    ports:
+      - "1602:80"
+    environment:
+      - FLAG=flag{knownsec}

@@ -764,3 +764,15 @@ class Psr6Cache
 
 echo base64_encode(serialize(new Psr6Cache()));
 ```
+
+## XXE
+
+### XXE-PHP-001
+
+> `先上传data.xml，发现/uploads/data.xml已经有原本文件，无法覆盖。通过"查看学籍数据"按钮发现index?file=可以加载任意xml文件。`
+>
+> `网页访问/uploads/data.xml找到原本xml文本数据格式，将可以页面回显的标签修改成XXE-payload。上传 data2.xml 成功后，通过index?file=data2.xml`
+
+### XXE-PHP-002
+
+> `与上一题类似的无回显XXE版本。考察无回显XXE下使用OOB带外获取数据，用XXE-OOB-payload带出到ceye或者vps上即可。`

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class>
+  <student>
+    <name>李明</name>    
+    <year>1998</year>
+    <school>THU</school>
+  </student>
+  <student>
+    <name>韩梅梅</name>
+    <year>1999</year>
+    <school>THU</school>
+  </student>
+  <student>
+    <name>刘帅</name>
+    <year>2000</year>
+    <school>PKU</school>
+  </student>
+  
+</class>
