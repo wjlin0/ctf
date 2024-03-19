@@ -16,6 +16,10 @@ base_directory="$1"
 if [[ "$base_directory" != /* ]]; then
     base_directory="$script_directory/$base_directory"
 fi
+# 如果 $base_directory 以 / 结尾 则删除 末尾的 /
+if [[ "$base_directory" == */ ]]; then
+    base_directory="${base_directory::-1}"
+fi
 
 action="$2"  # 获取命令行参数中的操作类型
 
@@ -49,7 +53,7 @@ for directory in "$base_directory"/*; do
                 ;;
             *)
                 # 未知的操作类型
-                echo "Unknown action: $action"
+                docker-compose $action;
                 ;;
         esac
 

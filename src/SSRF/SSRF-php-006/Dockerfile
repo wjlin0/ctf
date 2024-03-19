@@ -15,4 +15,5 @@ RUN docker-php-ext-install curl  \
     && sh -c 'mysqld_safe &' \
     && sleep 5s \
     && mysql -u root -proot -e "SET PASSWORD FOR 'root'@'localhost' = '';FLUSH PRIVILEGES;"  \
-    && rm -rf /var/cache/apk/*
+    && rm -rf /var/cache/apk/* \
+    && chmod +x /usr/local/bin/docker-php-entrypoint

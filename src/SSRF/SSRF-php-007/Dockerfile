@@ -6,7 +6,7 @@ COPY _file/ /tmp/
 
 RUN mv /tmp/flag.sh /flag.sh \
     && mv /tmp/docker-php-entrypoint /usr/local/bin/ \
-    && chmod +x /flag.sh && chmod +x /usr/local/bin/docker-php-entrypoint  && chmod +x /usr/local/bin/docker-php-entrypoint \
+    && chmod +x /flag.sh && chmod +x /usr/local/bin/docker-php-entrypoint \
     && apk add build-base openssl-dev \
     && cd /tmp/ \
     && tar -xzvf curl-7.68.0.tar.gz \

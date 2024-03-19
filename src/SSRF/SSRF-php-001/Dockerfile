@@ -3,6 +3,3 @@ ENV TZ=Asia/Shanghai
 LABEL org.opencontainers.image.authors="wjlin0"
 COPY src/ /var/www/html/
 COPY _file/flag.sh /flag.sh
-RUN apk add --update libzip-dev curl-dev  \
-    && docker-php-ext-install curl \
-    && rm -rf /var/cache/apk/*

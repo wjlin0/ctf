@@ -26,7 +26,6 @@
 
     <?php
     function fetchData($url) {
-
         $url = addslashes($url);
         $command = "curl \"" . $url."\" --output - -k --max-time 2";
         $handle = popen($command, "r");

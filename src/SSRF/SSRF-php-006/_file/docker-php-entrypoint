@@ -3,20 +3,20 @@
 mysqld_safe &
 
 mysql_ready() {
-	mysqladmin ping --socket=/run/mysqld/mysqld.sock --user=root  > /dev/null 2>&1
+    mysqladmin ping --socket=/run/mysqld/mysqld.sock --user=root > /dev/null 2>&1
 }
 
-while !(mysql_ready)
+while ! (mysql_ready)
 do
-	echo "waiting for mysql ..."
-	sleep 3
+    echo "waiting for mysql ..."
+    sleep 3
 done
 
-if [[ -f /flag.sh ]]; then
-	source /flag.sh
+if [ -f /flag.sh ]; then
+    . "/flag.sh"
 fi
 
-if [[ -f /var/www/html/db.sql ]]; then
+if [ -f /var/www/html/db.sql ]; then
     mysql -e "source /var/www/html/db.sql" -uroot
     rm -f /var/www/html/db.sql
 fi

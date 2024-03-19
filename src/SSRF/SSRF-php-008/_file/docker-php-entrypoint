@@ -6,21 +6,17 @@ redis_ready() {
 	redis-cli ping  > /dev/null 2>&1
 }
 
-# shellcheck disable=SC1035
-while !(redis_ready)
+while ! (redis_ready)
 do
 	echo "waiting for redis ..."
 	sleep 3
 done
 
-# shellcheck disable=SC2039
-if [[ -f /flag.sh ]]; then
-	source /flag.sh
+if [ -f /flag.sh ]; then
+	. /flag.sh
 fi
 
-# shellcheck disable=SC2039
-# shellcheck disable=SC1035
-if [[ -f /var/www/html/db.sql ]]; then
+if [ -f /var/www/html/db.sql ]; then
   rm /var/www/html/db.sql
 fi
 

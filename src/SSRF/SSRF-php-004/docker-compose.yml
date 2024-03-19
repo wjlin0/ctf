@@ -1,9 +1,10 @@
-version: '2'
+version: '3'
 services:
   web:
     build: .
     image: wjlin1/ctf:ssrf-php-004
     restart: always
+    platform: linux/amd64
     ports:
       - "1404:80"
     environment:

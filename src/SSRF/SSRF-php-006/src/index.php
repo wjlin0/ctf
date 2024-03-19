@@ -19,28 +19,14 @@
     <?php
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $urlInput = $_POST["proxy"];
-        $result = fetchData($urlInput);
-        echo '<p>Response from ' . $urlInput . ':</p><pre>' . htmlspecialchars($result) . '</pre>';
+        fetchData($urlInput);
     }
     ?>
 
     <?php
     function fetchData($url) {
-
         $url = addslashes($url);
-        $command = "curl \"" . $url."\" --output - -k";
-        $handle = popen($command, "r");
-        $buffers = "";
-
-// 读取输出
-        if ($handle) {
-            while (!feof($handle)) {
-                $buffer = fgets($handle);
-                $buffers .= $buffer;
-            }
-            pclose($handle);
-        }
-        return $buffers;
+        system("curl \"" . $url."\" --output - -k");
     }
     ?>
 
