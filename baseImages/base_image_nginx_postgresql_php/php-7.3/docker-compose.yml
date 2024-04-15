@@ -6,4 +6,4 @@ services:
     ports:
       - "8086:80"
     environment:
-      - FLAG=flag{knownsec}
+      - FLAG=ctf{123456789}

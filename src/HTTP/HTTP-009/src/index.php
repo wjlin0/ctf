@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] !== "POST"){
     die("<h1>请用POST访问</h1>");
 }
 
-if ($_SERVER["HTTP_USER_AGENT"] !== "knownsec"){
-    die("请用浏览器标识 knownsec 访问!");
+if ($_SERVER["HTTP_USER_AGENT"] !== "wjlin0"){
+    die("请用浏览器标识 wjlin0 访问!");
 }
 
 if (strpos($_SERVER['HTTP_REFERER'], 'flag.com') === false){

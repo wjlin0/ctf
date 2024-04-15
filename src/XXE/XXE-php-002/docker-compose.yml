@@ -8,4 +8,4 @@ services:
     ports:
       - "1602:80"
     environment:
-      - FLAG=flag{knownsec}
+      - FLAG=ctf{123456789}

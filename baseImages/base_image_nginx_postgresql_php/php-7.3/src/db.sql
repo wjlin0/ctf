@@ -37,4 +37,4 @@ CREATE TABLE users (
 -- ----------------------------
 INSERT INTO users (id, username, password) VALUES (1, 'admin', '37f5a03e27fbe570aa63e089b1d78f34');
 INSERT INTO users (id, username, password) VALUES (2, 'wjlin0', '37f5a03e27fbe570aa63e089b1d78f34');
-INSERT INTO users (id, username, password) VALUES (3, 'knownsec', '37f5a03e27fbe570aa63e089b1d78f34');
+INSERT INTO users (id, username, password) VALUES (3, 'ctf', '37f5a03e27fbe570aa63e089b1d78f34');
