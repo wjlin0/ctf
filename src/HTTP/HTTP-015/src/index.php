@@ -7,8 +7,8 @@ echo "<a href='/password.txt'>password</a><hr/><a href='/username.txt'>username<
 
 
 $user = $_POST["username"];
-$pass = $_POST["passowrd"];
-if ($user === $username && md5($pass) === $password){
+$pass = $_POST["password"];
+if ($user === $username && md5($password) === $pass){
     echo $flag;
 }else {
     echo "<h1>error username,password<hr/>  </h1>>";

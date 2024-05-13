@@ -10,8 +10,8 @@ usernamefile=/var/www/html/username.txt
 
 
 # 生成100个长度为4的随机字符串
-for i in {1..100}; do
-    random_string=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 4 | head -n 1)
+for i in $(seq 1 100); do
+    random_string=$(cat /dev/urandom |LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 4 | head -n 1)
     echo "$random_string" >> $passwordfile
 done
 
@@ -22,8 +22,8 @@ sed -i "s/1234/$custom_password/" $flagfile
 
 
 # 生成4个长度为4的随机用户名
-for i in {1..4}; do
-    random_username=$(cat /dev/urandom | tr -dc 'a-z' | fold -w 4 | head -n 1)
+for i in $(seq 1 4); do
+    random_username=$(cat /dev/urandom |LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 4 | head -n 1)
     # shellcheck disable=SC2086
     echo $random_username >> $usernamefile
 done

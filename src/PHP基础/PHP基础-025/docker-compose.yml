@@ -1,0 +1,11 @@
+version: '3'
+services:
+  web:
+    platform: linux/amd64
+    build: .
+    image: wjlin1/ctf:php-jichu-025
+    restart: always
+    ports:
+      - "1225:80"
+    environment:
+      - FLAG=ctf{123456789}
