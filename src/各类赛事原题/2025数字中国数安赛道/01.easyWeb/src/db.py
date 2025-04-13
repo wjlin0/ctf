@@ -5,7 +5,7 @@ from datetime import datetime
 class Database:
     def __init__(self, db_config=None):
         self.db_config = db_config or {
-            'host': '127.0.0.1',
+            'host': 'localhost',
             'user': 'root',
             'password': 'root',
             'database': 'ctf'
