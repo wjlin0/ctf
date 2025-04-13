@@ -7,7 +7,7 @@ class Database:
             'host': '127.0.0.1',
             'user': 'root',
             'password': 'root',
-            'database': 'ocr_db'
+            'database': 'ctf'
         }
         self.init_db()
     
