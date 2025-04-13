@@ -18,12 +18,15 @@ RUN apt-get update && apt-get install -y \
 # 复制应用代码
 COPY src/ /app/
 
+
+# 启动 MySQL 服务，执行初始化 SQL，并关闭 MySQL
+RUN sh -c 'mysqld_safe &' \
+    && sleep 1 \
+    && mysql -u root -e "source /app/db.sql" \
+    && mysqladmin -u root -proot shutdown
+
 # 安装Python依赖
-RUN pip install --no-cache-dir -r requirements.txt \
-    && mysqld_safe \
-    && sleep 2 \
-    && mysql -u root < /app/db.sql \
-    && mysqladmin shutdown
+RUN pip install --no-cache-dir -r requirements.txt
 
 # 复制启动脚本
 COPY _file/start.sh /start.sh
