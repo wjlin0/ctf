@@ -29,4 +29,7 @@ CREATE TABLE `flag` (
 -- ----------------------------
 INSERT INTO `flag` VALUES ('flag{********************************}');
 
-SET FOREIGN_KEY_CHECKS = 1;
+
+-- 设置 root 用户密码
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';  -- 设置 root 密码
+FLUSH PRIVILEGES;

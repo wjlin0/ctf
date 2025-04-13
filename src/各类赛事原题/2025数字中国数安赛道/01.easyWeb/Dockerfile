@@ -19,7 +19,11 @@ RUN apt-get update && apt-get install -y \
 COPY src/ /app/
 
 # 安装Python依赖
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+    && mysqld_safe \
+    && sleep 2 \
+    && mysql -u root < /app/db.sql \
+    && mysqladmin shutdown
 
 # 复制启动脚本
 COPY _file/start.sh /start.sh
