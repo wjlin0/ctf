@@ -1,0 +1,10 @@
+version: "3"
+services:
+  web:
+    build: .
+    image: wjlin1/base_image_nginx_php:5.6
+    platform: linux/amd64
+    ports:
+      - "8086:80"
+    environment:
+      - FLAG=ctf{123456789}

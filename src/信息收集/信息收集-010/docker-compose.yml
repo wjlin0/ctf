@@ -3,7 +3,7 @@ services:
   web:
     platform: linux/amd64
     build: .
-    image: wjlin1/ctf:xinxishouji-010
+    image: registry.cn-hangzhou.aliyuncs.com/wjlin0/ctf:xinxishouji-010
     restart: always
     ports:
       - "1010:80"

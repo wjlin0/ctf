@@ -3,7 +3,7 @@ services:
   web:
     platform: linux/amd64
     build: .
-    image: wjlin1/ctf:sql-mysql-014
+    image: registry.cn-hangzhou.aliyuncs.com/wjlin0/ctf:sql-mysql-014
     restart: always
     ports:
       - "1314:80"

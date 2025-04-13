@@ -1,0 +1,12 @@
+version: '3'
+services:
+  web:
+    platform: linux/amd64
+    build: .
+    image: registry.cn-hangzhou.aliyuncs.com/wjlin0/ctf:2024-tf-sa-web-001
+    restart: always
+
+    ports:
+      - "2001:80"
+    environment:
+      - FLAG=ctf{123456789}

@@ -3,7 +3,7 @@ services:
   web:
     platform: linux/amd64
     build: .
-    image: wjlin1/ctf:http-008
+    image: registry.cn-hangzhou.aliyuncs.com/wjlin0/ctf:http-008
     restart: always
     ports:
       - "1108:80"

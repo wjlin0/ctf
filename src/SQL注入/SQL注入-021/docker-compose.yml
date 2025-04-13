@@ -3,7 +3,7 @@ services:
   web:
     platform: linux/amd64
     build: .
-    image: wjlin1/ctf:sql-postgresql-021
+    image: registry.cn-hangzhou.aliyuncs.com/wjlin0/ctf:sql-postgresql-021
     restart: always
     ports:
       - "1321:80"

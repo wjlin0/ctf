@@ -3,7 +3,7 @@ services:
   web:
     build: .
     container_name: unserialize-php-011
-    image: wjlin1/ctf:unserialize-php-011
+    image: registry.cn-hangzhou.aliyuncs.com/wjlin0/ctf:unserialize-php-011
     restart: always
     platform: linux/amd64
     ports:

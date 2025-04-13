@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR文字识别</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/element-plus"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        .title {
+            text-align: center;
+            color: #409EFF;
+            margin-bottom: 30px;
+        }
+        .upload-container {
+            border: 2px dashed #409EFF;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            color: #606266;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        .upload-container:hover {
+            border-color: #79bbff;
+            background-color: #f5f7fa;
+        }
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <h1 class="title">OCR文字识别系统</h1>
+            
+            <el-upload
+                class="upload-container"
+                drag
+                action="/ocr"
+                :show-file-list="false"
+                :on-success="handleSuccess"
+                :on-error="handleError"
+                :before-upload="beforeUpload">
+                <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                <div class="el-upload__text">
+                    将文件拖到此处，或<em>点击上传</em>
+                </div>
+                <template #tip>
+                    <div class="el-upload__tip">
+                        支持jpg/png格式的图片文件
+                    </div>
+                </template>
+            </el-upload>
+
+            <div v-if="imageUrl" class="preview-section">
+                <h3>图片预览</h3>
+                <img :src="imageUrl" class="preview-image">
+            </div>
+
+            <div v-if="recognizedText" class="result-container">
+                <h3>识别结果</h3>
+                <el-input
+                    type="textarea"
+                    v-model="recognizedText"
+                    :rows="4"
+                    readonly>
+                </el-input>
+                <el-button 
+                    type="primary" 
+                    style="margin-top: 10px;"
+                    @click="copyText">复制文本</el-button>
+            </div>
+
+            <el-dialog
+                v-model="dialogVisible"
+                title="提示"
+                width="30%">
+                <span>{{ dialogMessage }}</span>
+                <template #footer>
+                    <span class="dialog-footer">
+                        <el-button @click="dialogVisible = false">确定</el-button>
+                    </span>
+                </template>
+            </el-dialog>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref } = Vue
+        const app = createApp({
+            setup() {
+                const imageUrl = ref('')
+                const recognizedText = ref('')
+                const dialogVisible = ref(false)
+                const dialogMessage = ref('')
+
+                const beforeUpload = (file) => {
+                    const isImage = file.type.startsWith('image/')
+                    if (!isImage) {
+                        dialogMessage.value = '请上传图片文件！'
+                        dialogVisible.value = true
+                        return false
+                    }
+                    imageUrl.value = URL.createObjectURL(file)
+                    return true
+                }
+
+                const handleSuccess = (response) => {
+                    if (response.success) {
+                        recognizedText.value = response.text
+                    } else {
+                        dialogMessage.value = response.error || '识别失败，请重试'
+                        dialogVisible.value = true
+                        recognizedText.value = ''
+                    }
+                }
+
+                const handleError = (error) => {
+                    const errorMessage = error.response?.data?.error || '上传失败，请重试'
+                    dialogMessage.value = errorMessage
+                    dialogVisible.value = true
+                    recognizedText.value = ''
+                }
+
+                const copyText = () => {
+                    if (!recognizedText.value) {
+                        dialogMessage.value = '没有可复制的文本'
+                        dialogVisible.value = true
+                        return
+                    }
+                    try {
+                        // 创建临时textarea元素
+                        const textarea = document.createElement('textarea')
+                        textarea.value = recognizedText.value
+                        document.body.appendChild(textarea)
+                        textarea.select()
+                        document.execCommand('copy')
+                        document.body.removeChild(textarea)
+                        dialogMessage.value = '文本已复制到剪贴板'
+                        dialogVisible.value = true
+                    } catch (err) {
+                        // 如果传统方法失败，尝试使用Clipboard API
+                        navigator.clipboard.writeText(recognizedText.value).then(() => {
+                            dialogMessage.value = '文本已复制到剪贴板'
+                            dialogVisible.value = true
+                        }).catch(err => {
+                            dialogMessage.value = '复制失败，请手动复制'
+                            dialogVisible.value = true
+                        })
+                    }
+                }
+
+                return {
+                    imageUrl,
+                    recognizedText,
+                    dialogVisible,
+                    dialogMessage,
+                    beforeUpload,
+                    handleSuccess,
+                    handleError,
+                    copyText
+                }
+            }
+        })
+
+        app.use(ElementPlus)
+        app.mount('#app')
+    </script>
+</body>
+</html>

@@ -2,7 +2,7 @@ version: '3'
 services:
   web:
     build: .
-    image: wjlin1/ctf:ssrf-php-002
+    image: registry.cn-hangzhou.aliyuncs.com/wjlin0/ctf:ssrf-php-002
     restart: always
     platform: linux/amd64
     ports:

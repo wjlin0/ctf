@@ -3,7 +3,7 @@ services:
   web:
     platform: linux/amd64
     build: .
-    image: wjlin1/ctf:php-jichu-006
+    image: registry.cn-hangzhou.aliyuncs.com/wjlin0/ctf:php-jichu-006
     restart: always
     ports:
       - "1206:80"

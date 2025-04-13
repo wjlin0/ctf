@@ -28,14 +28,14 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositorie
     && chown -R www-data:www-data /var/www/html \
     && mv /tmp/docker-php-ext-mysqli.ini /usr/local/etc/php/conf.d \
     && mv /tmp/docker-php-ext-pdo_mysql.ini /usr/local/etc/php/conf.d \
-    # clear
+    # clear \
     && rm -rf /var/www/html/db.sql \
-    && rm -rf /tmp/*
+    && rm -rf /tmp/* \
+    && rm -rf /var/cache/apk/*
 
 WORKDIR /var/www/html
 
 EXPOSE 80
 
-VOLUME ["/var/log/nginx"]
 
-CMD ["/bin/bash", "-c", "docker-php-entrypoint"]
+ENTRYPOINT ["/bin/bash", "-c", "docker-php-entrypoint"]

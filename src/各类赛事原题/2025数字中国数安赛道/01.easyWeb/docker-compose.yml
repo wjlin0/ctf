@@ -1,0 +1,11 @@
+version: '3'
+services:
+  web:
+    platform: linux/amd64
+    build: .
+    image: registry.cn-hangzhou.aliyuncs.com/wjlin0/ctf:2025-shuzianquan-shuan-web-01
+    restart: always
+    ports:
+      - "2001:8000"
+    environment:
+      - FLAG=ctf{123456789}
