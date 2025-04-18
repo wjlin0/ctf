@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  web:
+    platform: linux/amd64
+    image: registry.cn-hangzhou.aliyuncs.com/wjlin0/ctf:2025-nengyuan-ctf-web-easyinstall
+    restart: always
+
+    ports:
+      - "2002:80"
+    environment:
+      - FLAG=ctf{123456789}
